@@ -1,15 +1,34 @@
-﻿@model Movies.Web.Models.Movies.SearchResult
-<div class="col-lg-3 col-md-4 col-sm-6">
-    <article class="card">
-        <header class="title-header">
-            <h3>@Model.Title</h3>
-        </header>
-        <div class="card-block">
-            <div class="img-card">
-                <img src="@Model.ImageUrl" alt="Movie" class="w-100">
+﻿@*@model Movies.Web.Models.Movies.SearchResult*@
+@model Movies.Web.Models.Movies.SearchResult
+@*<section class="movies" id="movies">
+        <h2>Featured Movies</h2>
+        <div class="row">
+            @foreach (var movie in Model.Results)
+            {
+                <partial name="MovieResult" model="movie" />
+            }
             </div>
-            <p class="tagline card-text text-xs-center">@Model.Year</p>
-            <a href="@Url.Action("Details")" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
-        </div>
-    </article>
-</div>
+    </section>*@
+
+<section class="movies" id="movies">
+        <h2>Featured Movies</h2>
+        <div class="row">
+            @foreach (var movie in Model.Search)
+            {
+            <div class="col-lg-3">
+                <article class="card">
+                    <header class="title-header">
+                        <h3>@movie.Title</h3>
+                    </header>
+                    <div class="card-block">
+                        <div class="img-card">
+                            <img src="@movie.Poster" alt="Movie" class="w-100">
+                        </div>
+                        <p class="tagline card-text text-xs-center">@movie.Year</p>
+                        <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+                    </div>
+                </article>
+            </div>
+            }
+            </div>
+</section>

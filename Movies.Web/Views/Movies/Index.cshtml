@@ -1,8 +1,13 @@
-﻿@model Movies.Web.Models.Movies.SearchResults
+﻿@*@model Movies.Web.Models.Movies.SearchResults*@
 @{
     ViewData["Title"] = "Movies List";
 }
-    <section class="movies" id="movies">
+
+<form method="get" asp-controller="Movies" asp-action="MovieResult">
+    <br />
+        <input type="text" name="s">
+        <input type="submit" value="Search" />
+    @*<section class="movies" id="movies">
         <h2>Featured Movies</h2>
         <div class="row">
             @foreach (var movie in Model.Results)
@@ -10,4 +15,5 @@
                 <partial name="MovieResult" model="movie" />
             }
             </div>
-    </section>
+    </section>*@
+</form>
