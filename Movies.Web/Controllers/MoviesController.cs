@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Movies.Web.Models.JSONLD;
 using Movies.Web.Models.Movies;
 using Newtonsoft.Json;
 using RestSharp;
@@ -49,11 +50,25 @@ namespace Movies.Web.Controllers
             //client.UseDotNetXmlSerializer();
             //var queryResult = client.Execute<SearchResult>(request).Content;
             //var queryResult2 = client.Execute<SearchResult>(request);
-            var queryResult = client.Execute<SearchResult>(request).Data;
+            var response = client.Execute<SearchResult>(request);
+            var queryResult = response.Data;
 
             //string json = JsonConvert.SerializeObject(queryResult.Content);
-
             //return View(new SearchResult { Title=movieToSearch, Year=2019, Poster="testImageUrl" });
+
+            var summaryJSONLD = new Summary();
+
+            queryResult.Search.ForEach(movieInfo => {
+                summaryJSONLD.itemListElement.Add(
+                    new Summary.ItemListElement
+                    {
+                        @type = "ListItem",
+                        position = $"{summaryJSONLD.itemListElement.Count + 1}",
+                        url = movieInfo.Poster
+                    }
+                );
+            });
+
             return View(queryResult);
         }
 
@@ -63,7 +78,8 @@ namespace Movies.Web.Controllers
             var client = new RestClient(strUrlMovieDetail);
             var request = new RestRequest(Method.GET);
             request.AddHeader("content-type", "application/json");
-            var queryResult = client.Execute<Details>(request).Data;
+            var response = client.Execute<Details>(request);
+            var queryResult = response.Data;
 
             return View(queryResult);
         }
