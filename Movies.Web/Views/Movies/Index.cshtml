@@ -5,7 +5,11 @@
 
 <form method="get" asp-controller="Movies" asp-action="MovieResult">
     <br />
-    <input type="text" name="s">
+    <label class="control-label" for="s">Title:</label>
+    <input type="text" id="s" name="s" class="input-small">
+    <label class="control-label" for="y">Year:</label>
+    <input type="text" id="y" name="y" class="input-small" style="width: 100px;">
+    @*<input type="text" name="s">*@
     <input type="submit" value="Search" />
     @*<section class="movies" id="movies">
             <h2>Featured Movies</h2>
@@ -17,12 +21,3 @@
                 </div>
         </section>*@
 </form>
-
-@section JSONLD
-{
-    <script type="application/ld+json">
-    {
-        // Index: Put JSON+LD HERE
-    }
-    </script>
-}

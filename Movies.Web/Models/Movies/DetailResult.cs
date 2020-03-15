@@ -28,7 +28,7 @@ namespace Movies.Web.Models.Movies
         public string totalSeasons { get; set; }
         public bool Response { get; set; }
 
-        public AllInOne detailJSONLD { get; set; }
+        public Movie movie { get; set; }
     }
 
     public class Rating

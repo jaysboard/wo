@@ -1,5 +1,29 @@
 ﻿@*@model Movies.Web.Models.Movies.SearchResult*@
 @model Movies.Web.Models.Movies.SearchResult
+@{
+    ViewData["Title"] = $"Search results for '{Model.SearchString}' {(!string.IsNullOrWhiteSpace(Model.SearchYear) ? " by year '" + Model.SearchYear + "'": "")} ({Model.totalResults + " results found"})";
+}
+<h2>@ViewData["Title"]</h2>
+<div>
+    <ul class="pagination">
+        <li class="page-item @(!Model.ShowFirst? "disabled":"")">
+            <a href="@Url.Action("MovieResult", "Movies", new { s = Model.SearchString, y = Model.SearchYear, page = "1" })" class="page-link"><i class="fas fa-fast-backward"></i></a>
+        </li>
+
+        <li class="page-item @(!Model.ShowPrevious? "disabled":"")">
+            <a href="@Url.Action("MovieResult", "Movies", new { s = Model.SearchString, y = Model.SearchYear, page = Model.CurrentPage - 1 })" class="page-link"><i class="fas fa-step-backward"></i></a>
+        </li>
+        <li class="page-item  @(!Model.ShowNext? "disabled":"")">
+            <a href="@Url.Action("MovieResult", "Movies", new { s = Model.SearchString, y = Model.SearchYear, page = Model.CurrentPage + 1 })" class="page-link"><i class="fas fa-step-forward"></i></a>
+        </li>
+
+        <li class="page-item  @(!Model.ShowLast? "disabled":"")">
+            <a href="@Url.Action("MovieResult", "Movies", new { s = Model.SearchString, y = Model.SearchYear, page = Model.TotalPages })" class="page-link"><i class="fas fa-fast-forward"></i></a>
+        </li>
+    </ul>
+    <h3>Page @Model.CurrentPage</h3>
+</div>
+
 @*<section class="movies" id="movies">
         <h2>Featured Movies</h2>
         <div class="row">
@@ -10,8 +34,7 @@
             </div>
     </section>*@
 
-<section class="movies" id="movies">
-    <h2>Featured Movies</h2>
+<section class="movies" id="movies">    
     <div class="row">
         @{
             if (Model?.Response == true)
@@ -43,6 +66,7 @@
         }
     </div>
 </section>
+
 
 @section JSONLD
 {

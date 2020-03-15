@@ -1,4 +1,8 @@
 ﻿@model Movies.Web.Models.Movies.DetailResult
+@{
+    ViewData["Title"] = $"Movie details for \"{Model.Title}\"";
+}
+
 <div class="col-lg-3 col-md-4 col-sm-6">
     <article class="card">
         <header class="title-header">
@@ -8,8 +12,10 @@
             <div class="img-card">
                 <img src="@Model.Poster" alt="Movie" class="w-100">
             </div>
-            <p class="tagline card-text text-xs-center">@Model.Year</p>
-            <p class="tagline card-text text-xs-center">@Model.Plot</p>
+            <p class="tagline card-text text-xs-center">Released: @Model.Released</p>
+            <p class="tagline card-text text-xs-center">Plot: @Model.Plot</p>
+            <p class="tagline card-text text-xs-center">Director: @Model.Director</p>
+            <p class="tagline card-text text-xs-center">IMDB rating: @Model.imdbRating/10 (@Model.imdbVotes)</p>
         </div>
     </article>
 </div>
@@ -17,10 +23,16 @@
 @section JSONLD
 {
     @{
-        if (Model?.detailJSONLD != null)
+        if (Model?.movie != null)
         {
             <script type="application/ld+json">
-                @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.detailJSONLD, Newtonsoft.Json.Formatting.Indented))
+                @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    Model.movie, 
+                    Newtonsoft.Json.Formatting.Indented,
+                    new Newtonsoft.Json.JsonSerializerSettings { 
+                        NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
+                    }
+                ))
             </script>
         }
     }

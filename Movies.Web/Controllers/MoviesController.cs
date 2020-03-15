@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Movies.Web.Models.JSONLD;
 using Movies.Web.Models.Movies;
-using Newtonsoft.Json;
 using RestSharp;
-using RestSharp.Serialization.Xml;
-using System.Collections.Generic;
 
 namespace Movies.Web.Controllers
 {
@@ -33,9 +28,9 @@ namespace Movies.Web.Controllers
             return View();
         }
 
-        public IActionResult MovieResult(string s)
+        public IActionResult MovieResult(string s, string y = "", string page = "")
         {
-            string strURL = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&s={s}";
+            string strURL = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&s={s}{(!string.IsNullOrWhiteSpace(y)? "&y=" + y : "")}{(!string.IsNullOrWhiteSpace(page) ? "&page=" + page : "")}";
             var client = new RestClient(strURL);
 
             var request = new RestRequest(Method.GET);
@@ -43,39 +38,58 @@ namespace Movies.Web.Controllers
 
             var response = client.Execute<SearchResult>(request);
             var searchResult = response.Data;
+            searchResult.SearchString = s;
+            searchResult.SearchYear = y;
 
             if (searchResult?.Response == true)
             {
-                var summaryJSONLD = new Summary();
+                var jsonLDSummary = new JSONLDSummary();
                 searchResult?.Search?.ForEach(movieInfo =>
                 {
-                    summaryJSONLD.itemListElement.Add(
-                        new Summary.ItemListElement
+                    jsonLDSummary.itemListElement.Add(
+                        new JSONLDSummary.ItemListElement
                         {
-                            @type = "ListItem",
-                            position = $"{summaryJSONLD.itemListElement.Count + 1}",
+                            position = $"{jsonLDSummary.itemListElement.Count + 1}",
                             url = Url.Action("Details", "Movies", new { i = movieInfo.imdbID }, this.Request.Scheme)
                         }
                     );
                 });
 
-                searchResult.summaryJSONLD = summaryJSONLD;
+                searchResult.summaryJSONLD = jsonLDSummary;
             }
 
+            int nCurrentPage = searchResult.CurrentPage;
+
+            try
+            {
+                nCurrentPage = string.IsNullOrWhiteSpace(page) ? 1 : int.Parse(page);
+            }
+            catch (System.Exception)
+            {
+
+                nCurrentPage = searchResult.CurrentPage;
+            }
+
+            setPagination(searchResult, nCurrentPage);
+
             return View(searchResult);
+        }
+
+        private void setPagination(SearchResult searchResult, int nCurrentPage)
+        {
+            searchResult.CurrentPage = nCurrentPage;
+            searchResult.Count = searchResult.totalResults;
+            searchResult.PageSize = 10;
+            searchResult.TotalPages = (int)System.Math.Ceiling(decimal.Divide(searchResult.Count, searchResult.PageSize));
+            searchResult.ShowPrevious = searchResult.CurrentPage > 1;
+            searchResult.ShowNext = searchResult.CurrentPage < searchResult.TotalPages;
+            searchResult.ShowFirst = searchResult.CurrentPage != 1;
+            searchResult.ShowLast = (searchResult.TotalPages != 0) && (searchResult.CurrentPage != searchResult.TotalPages);
         }
 
         public IActionResult Details(string i)
         {
             string strURL = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&i={i}";
-            //var client = new RestClient(strURL);
-            //var request = new RestRequest(Method.GET);
-            //request.AddHeader("content-type", "application/json");
-            //var response = client.Execute<Details>(request);
-            //var queryResult = response.Data;
-
-            //return View(queryResult);
-
             var client = new RestClient(strURL);
 
             var request = new RestRequest(Method.GET);
@@ -86,37 +100,24 @@ namespace Movies.Web.Controllers
 
             if (detailResult?.Response == true)
             {
-                var detailsJSONLD = new AllInOne();
-                //detailResult?.Search?.ForEach(movieInfo =>
-                //{
-                //    detailsJSONLD.itemListElement.Add(
-                //        new Summary.ItemListElement
-                //        {
-                //            @type = "ListItem",
-                //            position = $"{detailsJSONLD.itemListElement.Count + 1}",
-                //            url = Url.Action("Details", "Movies", new { i = movieInfo.imdbID }, this.Request.Scheme)
-                //        }
-                //    );
-                //});
-                //detailsJSONLD.
-
-                detailsJSONLD.itemListElement.Add(
-                    new AllInOne.ItemListElement
+                var jsonLDMovie = new Movie
+                {
+                    image = detailResult.Poster,
+                    name = detailResult.Title,
+                    aggregateRating = new AggregateRating 
                     {
-                        @type = "ListItem",
-                        position = $"{detailsJSONLD.itemListElement.Count + 1}",
-                        item = new AllInOne.Item
-                        {
-                            name = detailResult.Title,
-                            image = detailResult.Poster,
-                            dateCreated = detailResult.Released,
-                            director = new AllInOne.Director { name = detailResult.Director },
-                            url = Url.Action("Details", "Movies", new { i = detailResult.imdbID }, this.Request.Scheme)
-                        }
-                    }
-                );
+                        author = new Author { type = "Organization", name = "IMDB" },
+                        ratingValue = detailResult.imdbRating,
+                        bestRating = "10", 
+                        ratingCount = detailResult.imdbVotes
+                    },
+                    dateCreated = detailResult.Released,
+                    director = new Director { name = detailResult.Director },
+                    url = Url.Action("Details", "Movies", new { i = detailResult.imdbID }, this.Request.Scheme),
+                    description = detailResult.Plot
+                };
 
-                detailResult.detailJSONLD = detailsJSONLD;
+                detailResult.movie = jsonLDMovie;
             }
 
             return View(detailResult);
