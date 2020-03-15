@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Movies.Web.Models.JSONLD;
+using System.Collections.Generic;
 
 namespace Movies.Web.Models.Movies
 {
-    public class Details
+    public class DetailResult
     {
         public string Title { get; set; }
         public string Year { get; set; }
@@ -25,7 +26,9 @@ namespace Movies.Web.Models.Movies
         public string imdbID { get; set; }
         public string Type { get; set; }
         public string totalSeasons { get; set; }
-        public string Response { get; set; }
+        public bool Response { get; set; }
+
+        public AllInOne detailJSONLD { get; set; }
     }
 
     public class Rating

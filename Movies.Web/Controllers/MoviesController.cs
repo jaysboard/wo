@@ -30,34 +30,24 @@ namespace Movies.Web.Controllers
 
         public IActionResult Index()
         {
-            //var model = new SearchResults();
-            //model.LoadSampleData();
-            //return View(model);
             return View();
         }
 
         public IActionResult MovieResult(string s)
         {
-            string strUrlMovieSearh = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&s={s}";
-            var client = new RestClient(strUrlMovieSearh);
-            //var request = new RestRequest(Method.GET);
-            //IRestResponse response = client.Execute(request);
-            //response.get
+            string strURL = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&s={s}";
+            var client = new RestClient(strURL);
+
             var request = new RestRequest(Method.GET);
             request.AddHeader("content-type", "application/json");
-            //client.UseDotNetXmlSerializer();
-            //var queryResult = client.Execute<SearchResult>(request).Content;
-            //var queryResult2 = client.Execute<SearchResult>(request);
+
             var response = client.Execute<SearchResult>(request);
-            var queryResult = response.Data;
+            var searchResult = response.Data;
 
-            //string json = JsonConvert.SerializeObject(queryResult.Content);
-            //return View(new SearchResult { Title=movieToSearch, Year=2019, Poster="testImageUrl" });
-
-            if (queryResult?.Response == true)
+            if (searchResult?.Response == true)
             {
                 var summaryJSONLD = new Summary();
-                queryResult?.Search?.ForEach(movieInfo =>
+                searchResult?.Search?.ForEach(movieInfo =>
                 {
                     summaryJSONLD.itemListElement.Add(
                         new Summary.ItemListElement
@@ -69,29 +59,67 @@ namespace Movies.Web.Controllers
                     );
                 });
 
-                //HtmlGenericControl newControl = new HtmlGenericControl("someTag");
-                //newControl.Attributes["someAttr"] = "some value";
-                //Page.Header.Controls.Add(newControl);
-
-                //Response.Headers.Add("X-Total-Count", "20");
-                //TagHelperContext
-
-                queryResult.summaryJSONLD = summaryJSONLD;
+                searchResult.summaryJSONLD = summaryJSONLD;
             }
 
-            return View(queryResult);
+            return View(searchResult);
         }
 
         public IActionResult Details(string i)
         {
-            string strUrlMovieDetail = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&i={i}";
-            var client = new RestClient(strUrlMovieDetail);
+            string strURL = $"https://www.omdbapi.com/?apikey={_strOMDbAPI}&i={i}";
+            //var client = new RestClient(strURL);
+            //var request = new RestRequest(Method.GET);
+            //request.AddHeader("content-type", "application/json");
+            //var response = client.Execute<Details>(request);
+            //var queryResult = response.Data;
+
+            //return View(queryResult);
+
+            var client = new RestClient(strURL);
+
             var request = new RestRequest(Method.GET);
             request.AddHeader("content-type", "application/json");
-            var response = client.Execute<Details>(request);
-            var queryResult = response.Data;
 
-            return View(queryResult);
+            var response = client.Execute<DetailResult>(request);
+            var detailResult = response.Data;
+
+            if (detailResult?.Response == true)
+            {
+                var detailsJSONLD = new AllInOne();
+                //detailResult?.Search?.ForEach(movieInfo =>
+                //{
+                //    detailsJSONLD.itemListElement.Add(
+                //        new Summary.ItemListElement
+                //        {
+                //            @type = "ListItem",
+                //            position = $"{detailsJSONLD.itemListElement.Count + 1}",
+                //            url = Url.Action("Details", "Movies", new { i = movieInfo.imdbID }, this.Request.Scheme)
+                //        }
+                //    );
+                //});
+                //detailsJSONLD.
+
+                detailsJSONLD.itemListElement.Add(
+                    new AllInOne.ItemListElement
+                    {
+                        @type = "ListItem",
+                        position = $"{detailsJSONLD.itemListElement.Count + 1}",
+                        item = new AllInOne.Item
+                        {
+                            name = detailResult.Title,
+                            image = detailResult.Poster,
+                            dateCreated = detailResult.Released,
+                            director = new AllInOne.Director { name = detailResult.Director },
+                            url = Url.Action("Details", "Movies", new { i = detailResult.imdbID }, this.Request.Scheme)
+                        }
+                    }
+                );
+
+                detailResult.detailJSONLD = detailsJSONLD;
+            }
+
+            return View(detailResult);
         }
     }
 }
