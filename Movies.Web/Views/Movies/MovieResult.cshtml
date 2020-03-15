@@ -11,24 +11,47 @@
     </section>*@
 
 <section class="movies" id="movies">
-        <h2>Featured Movies</h2>
-        <div class="row">
-            @foreach (var movie in Model.Search)
+    <h2>Featured Movies</h2>
+    <div class="row">
+        @{
+            if (Model?.Response == true)
             {
-            <div class="col-lg-3">
-                <article class="card">
-                    <header class="title-header">
-                        <h3>@movie.Title</h3>
-                    </header>
-                    <div class="card-block">
-                        <div class="img-card">
-                            <img src="@movie.Poster" alt="Movie" class="w-100">
-                        </div>
-                        <p class="tagline card-text text-xs-center">@movie.Year</p>
-                        <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+                foreach (var movie in Model.Search)
+                {
+                    <div class="col-lg-3">
+                        <article class="card">
+                            <header class="title-header">
+                                <h3>@movie.Title</h3>
+                            </header>
+                            <div class="card-block">
+                                <div class="img-card">
+                                    <img src="@movie.Poster" alt="Movie" class="w-100">
+                                </div>
+                                <p class="tagline card-text text-xs-center">@movie.Year</p>
+                                <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+                            </div>
+                        </article>
                     </div>
-                </article>
-            </div>
+                }
             }
-            </div>
+            else
+            {
+                <div class="col-lg-3">
+                    <h4>@Model.Error</h4>
+                </div>
+            }
+        }
+    </div>
 </section>
+
+@section JSONLD
+{
+    @{
+        if (Model?.summaryJSONLD != null)
+        {
+            <script type="application/ld+json">
+                @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.summaryJSONLD, Newtonsoft.Json.Formatting.Indented))
+            </script>
+        }
+    }
+}

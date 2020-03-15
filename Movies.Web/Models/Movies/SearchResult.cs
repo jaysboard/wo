@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using Movies.Web.Models.JSONLD;
+using System.Collections.Generic;
 
 namespace Movies.Web.Models.Movies
 {
     public class SearchResult
     {
-        //public List<MovieInfo> Search;
         public List<MovieInfo> Search { get; set; }
         public int totalResults { get; set; }
         public bool Response { get; set; }
+        public string Error { get; set; }
+        public Summary summaryJSONLD { get; set; }
     }
 
     public class MovieInfo

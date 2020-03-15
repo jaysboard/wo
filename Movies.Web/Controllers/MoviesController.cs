@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Movies.Web.Models.JSONLD;
@@ -13,8 +15,6 @@ namespace Movies.Web.Controllers
     public class MoviesController : Controller
     {
         ILogger<MoviesController> _logger;
-        IConfiguration _configuration;
-
         string _strOMDbAPI = "";
 
         public MoviesController(
@@ -23,11 +23,9 @@ namespace Movies.Web.Controllers
         )
         {            
             _logger = logger;
+            _logger.LogInformation("MoviesController");
 
-            _configuration = configuration;
-            _strOMDbAPI = _configuration.GetValue<string>("AppSettings:OMDbAPI");
-
-            _logger.LogInformation("MoviesController");            
+            _strOMDbAPI = configuration.GetValue<string>("AppSettings:OMDbAPI");
         }
 
         public IActionResult Index()
@@ -56,18 +54,30 @@ namespace Movies.Web.Controllers
             //string json = JsonConvert.SerializeObject(queryResult.Content);
             //return View(new SearchResult { Title=movieToSearch, Year=2019, Poster="testImageUrl" });
 
-            var summaryJSONLD = new Summary();
+            if (queryResult?.Response == true)
+            {
+                var summaryJSONLD = new Summary();
+                queryResult?.Search?.ForEach(movieInfo =>
+                {
+                    summaryJSONLD.itemListElement.Add(
+                        new Summary.ItemListElement
+                        {
+                            @type = "ListItem",
+                            position = $"{summaryJSONLD.itemListElement.Count + 1}",
+                            url = Url.Action("Details", "Movies", new { i = movieInfo.imdbID }, this.Request.Scheme)
+                        }
+                    );
+                });
 
-            queryResult.Search.ForEach(movieInfo => {
-                summaryJSONLD.itemListElement.Add(
-                    new Summary.ItemListElement
-                    {
-                        @type = "ListItem",
-                        position = $"{summaryJSONLD.itemListElement.Count + 1}",
-                        url = movieInfo.Poster
-                    }
-                );
-            });
+                //HtmlGenericControl newControl = new HtmlGenericControl("someTag");
+                //newControl.Attributes["someAttr"] = "some value";
+                //Page.Header.Controls.Add(newControl);
+
+                //Response.Headers.Add("X-Total-Count", "20");
+                //TagHelperContext
+
+                queryResult.summaryJSONLD = summaryJSONLD;
+            }
 
             return View(queryResult);
         }

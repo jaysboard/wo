@@ -5,15 +5,24 @@
 
 <form method="get" asp-controller="Movies" asp-action="MovieResult">
     <br />
-        <input type="text" name="s">
-        <input type="submit" value="Search" />
+    <input type="text" name="s">
+    <input type="submit" value="Search" />
     @*<section class="movies" id="movies">
-        <h2>Featured Movies</h2>
-        <div class="row">
-            @foreach (var movie in Model.Results)
-            {
-                <partial name="MovieResult" model="movie" />
-            }
-            </div>
-    </section>*@
+            <h2>Featured Movies</h2>
+            <div class="row">
+                @foreach (var movie in Model.Results)
+                {
+                    <partial name="MovieResult" model="movie" />
+                }
+                </div>
+        </section>*@
 </form>
+
+@section JSONLD
+{
+    <script type="application/ld+json">
+    {
+        // Index: Put JSON+LD HERE
+    }
+    </script>
+}
