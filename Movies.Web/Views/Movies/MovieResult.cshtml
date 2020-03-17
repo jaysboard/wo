@@ -27,6 +27,9 @@
             column-count: 5;
         }
     }*/
+    .card-custom {
+        max-width: 128px;
+    }
 </style>
 
 <h2>@ViewData["Title"]</h2>
@@ -73,7 +76,47 @@
 </article>
 *@
 
-<section class="movies" id="movies">
+<div class="container-fluid">
+    <div class="row">
+        @{
+            if (Model?.Response == true)
+            {
+                int nCount = Model.Search.Count;
+                decimal iCtr = 0;
+                foreach (var movie in Model.Search)
+                {
+                    iCtr++;
+                    <div class="">
+                        <div class="card h-75">
+                            <img class="card-img-top img-fluid" src="@movie.Poster" alt="Movie">
+                            <div class="card-block">
+                                <h5 class="card-title">@movie.Title (@movie.Year)</h5>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    //if (iCtr == Math.Floor((decimal)(nCount / 2)))
+                    //{
+                    //    Console.WriteLine(iCtr);
+                    //    <div class="w-100"></div>
+                    //}
+                }
+            }
+            else
+            {
+                <div>
+                    <h4>@Model.Error</h4>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+
+<section class="movies" id="movies" style="display:none">
     <div class="jcard-group">
         <div class="card-deck" style="column-count: 5;">
             @{
@@ -99,9 +142,71 @@
                     </div>
                 }
             }
+
         </div>
     </div>
 </section>
+
+@*
+<style>
+    .list-group-item {
+	width: 95%;
+	margin: 1% !important;
+}
+
+@@media (min-width: 576px) {
+	.list-group-item {
+		width: 47%;
+		margin: 5px 1.5% !important;
+	}
+}
+
+@@media (min-width: 768px) {
+	.list-group-item {
+		width: 31.333%;
+		margin: 5px 1% !important;
+	}
+}
+
+@@media (min-width: 992px) {
+	.list-group-item {
+		width: 23%;
+		margin: 5px 1% !important;
+	}
+}
+
+</style>
+*@
+
+<div style="display:none">
+@{
+    if (Model?.Response == true)
+    {
+        <ul class="list-group list-group-horizontal align-items-stretch flex-wrap">
+            @{ 
+                foreach (var movie in Model.Search)
+                {
+                    <li class="list-group-item border-0">
+                        <div class="card">
+                            <img class="card-img-top" src="@movie.Poster" alt="Movie">
+                            <div class="card-body">
+                                <h4 class="card-title">@movie.Title (@movie.Year)</h4>
+                                <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="col-lg-3">
+            <h4>@Model.Error</h4>
+        </div>
+    }
+}
+</div>
 
 
 @section JSONLD
