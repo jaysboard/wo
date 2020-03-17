@@ -1,8 +1,34 @@
 ﻿@*@model Movies.Web.Models.Movies.SearchResult*@
 @model Movies.Web.Models.Movies.SearchResult
 @{
-    ViewData["Title"] = $"Search results for '{Model.SearchString}' {(!string.IsNullOrWhiteSpace(Model.SearchYear) ? " by year '" + Model.SearchYear + "'": "")} ({Model.totalResults + " results found"})";
+    ViewData["Title"] = $"Search results for '{Model.SearchString}' {(!string.IsNullOrWhiteSpace(Model.SearchYear) ? " by year '" + Model.SearchYear + "'" : "")} ({Model.totalResults + " results found"})";
 }
+<style type="text/css">
+    /*@@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+    }
+
+    @@media (min-width: 768px) {
+        .card-columns {
+            column-count: 3;
+        }
+    }
+
+    @@media (min-width: 992px) {
+        .card-columns {
+            column-count: 4;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        .card-columns {
+            column-count: 5;
+        }
+    }*/
+</style>
+
 <h2>@ViewData["Title"]</h2>
 <div>
     <ul class="pagination">
@@ -34,36 +60,46 @@
             </div>
     </section>*@
 
-<section class="movies" id="movies">    
-    <div class="row">
-        @{
-            if (Model?.Response == true)
-            {
-                foreach (var movie in Model.Search)
+@*
+<article class="card">
+    <header class="card-title">@movie.Title</header>
+    <div class="card-block">
+        <div class="img-card">
+            <img src="@movie.Poster" alt="Movie" class="w-100">
+        </div>
+        <p class="tagline card-text text-xs-center">@movie.Year</p>
+        <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+    </div>
+</article>
+*@
+
+<section class="movies" id="movies">
+    <div class="jcard-group">
+        <div class="card-deck" style="column-count: 5;">
+            @{
+                if (Model?.Response == true)
                 {
-                    <div class="col-lg-3">
-                        <article class="card">
-                            <header class="title-header">
-                                <h3>@movie.Title</h3>
-                            </header>
+                    foreach (var movie in Model.Search)
+                    {
+                        <div class="card">
+                            <img class="card-img-top img-fluid" src="@movie.Poster" alt="Movie">
                             <div class="card-block">
-                                <div class="img-card">
-                                    <img src="@movie.Poster" alt="Movie" class="w-100">
-                                </div>
-                                <p class="tagline card-text text-xs-center">@movie.Year</p>
+                                <h5 class="card-title">@movie.Title (@movie.Year)</h5>
+                            </div>
+                            <div>
                                 <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
                             </div>
-                        </article>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-lg-3">
+                        <h4>@Model.Error</h4>
                     </div>
                 }
             }
-            else
-            {
-                <div class="col-lg-3">
-                    <h4>@Model.Error</h4>
-                </div>
-            }
-        }
+        </div>
     </div>
 </section>
 
