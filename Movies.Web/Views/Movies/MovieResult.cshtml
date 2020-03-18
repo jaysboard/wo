@@ -1,36 +1,7 @@
-﻿@*@model Movies.Web.Models.Movies.SearchResult*@
-@model Movies.Web.Models.Movies.SearchResult
+﻿@model Movies.Web.Models.Movies.SearchResult
 @{
-    ViewData["Title"] = $"Search results for '{Model.SearchString}' {(!string.IsNullOrWhiteSpace(Model.SearchYear) ? " by year '" + Model.SearchYear + "'" : "")} ({Model.totalResults + " results found"})";
+    ViewData["Title"] = $"Search results for '{Model.SearchString}' {(!string.IsNullOrWhiteSpace(Model.SearchYear) ? " by year '" + Model.SearchYear + "'" : "")} ({Model.totalResults + " results found"})";    
 }
-<style type="text/css">
-    /*@@media (min-width: 576px) {
-    .card-columns {
-        column-count: 2;
-    }
-    }
-
-    @@media (min-width: 768px) {
-        .card-columns {
-            column-count: 3;
-        }
-    }
-
-    @@media (min-width: 992px) {
-        .card-columns {
-            column-count: 4;
-        }
-    }
-
-    @@media (min-width: 1200px) {
-        .card-columns {
-            column-count: 5;
-        }
-    }*/
-    .card-custom {
-        max-width: 128px;
-    }
-</style>
 
 <h2>@ViewData["Title"]</h2>
 <div>
@@ -53,159 +24,54 @@
     <h3>Page @Model.CurrentPage</h3>
 </div>
 
-@*<section class="movies" id="movies">
-        <h2>Featured Movies</h2>
-        <div class="row">
-            @foreach (var movie in Model.Results)
-            {
-                <partial name="MovieResult" model="movie" />
-            }
-            </div>
-    </section>*@
+<div>
+    @{
+        if (Model?.Response == true)
+        {
+            int nCardsPerRow = 5;
+            int nTotalCount = Model.Search.Count;
+            int nRowCount = (nTotalCount <= nCardsPerRow) ? nTotalCount : (int)Math.Floor((decimal)(nTotalCount / nCardsPerRow));
 
-@*
-<article class="card">
-    <header class="card-title">@movie.Title</header>
-    <div class="card-block">
-        <div class="img-card">
-            <img src="@movie.Poster" alt="Movie" class="w-100">
-        </div>
-        <p class="tagline card-text text-xs-center">@movie.Year</p>
-        <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
-    </div>
-</article>
-*@
-
-<div class="container-fluid">
-    <div class="row">
-        @{
-            if (Model?.Response == true)
+            for (int nRowCounter = 0; nRowCounter < nRowCount; nRowCounter++)
             {
-                int nCount = Model.Search.Count;
-                decimal iCtr = 0;
-                foreach (var movie in Model.Search)
+                int iStartRowIndex = (nRowCounter * nCardsPerRow);
+
+                int iLastRowIndex = nTotalCount;
+                if (iLastRowIndex > ((nRowCounter + 1) * nCardsPerRow))
                 {
-                    iCtr++;
-                    <div class="">
-                        <div class="card h-75">
-                            <img class="card-img-top img-fluid" src="@movie.Poster" alt="Movie">
-                            <div class="card-block">
-                                <h5 class="card-title">@movie.Title (@movie.Year)</h5>
-                            </div>
-                            <div>
-                                <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    //if (iCtr == Math.Floor((decimal)(nCount / 2)))
-                    //{
-                    //    Console.WriteLine(iCtr);
-                    //    <div class="w-100"></div>
-                    //}
+                    iLastRowIndex = ((nRowCounter + 1) * nCardsPerRow);
                 }
-            }
-            else
-            {
-                <div>
-                    <h4>@Model.Error</h4>
+
+                <div class="row">
+                    <div class="card-deck">
+                        @for (int iRowIndex = iStartRowIndex; iRowIndex < iLastRowIndex; iRowIndex++)
+                        {
+                            var movie = Model.Search[iRowIndex];
+                            <div class="col">
+                                <div class="card">
+                                    <img class="card-img-top img-fluid" src=@movie.Poster alt="Movie" style="width: 100%; height: 100%; min-width: 100%; min-height: 100%">
+                                    <div class="card-body px-1">
+                                        <div class="card-title "><strong>@movie.Title (@movie.Year)</strong></div>
+                                    </div>
+                                    <div>
+                                        <a href="@Url.Action("Details", "Movies", new { i = @movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         }
-
-    </div>
-</div>
-
-<section class="movies" id="movies" style="display:none">
-    <div class="jcard-group">
-        <div class="card-deck" style="column-count: 5;">
-            @{
-                if (Model?.Response == true)
-                {
-                    foreach (var movie in Model.Search)
-                    {
-                        <div class="card">
-                            <img class="card-img-top img-fluid" src="@movie.Poster" alt="Movie">
-                            <div class="card-block">
-                                <h5 class="card-title">@movie.Title (@movie.Year)</h5>
-                            </div>
-                            <div>
-                                <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="col-lg-3">
-                        <h4>@Model.Error</h4>
-                    </div>
-                }
-            }
-
-        </div>
-    </div>
-</section>
-
-@*
-<style>
-    .list-group-item {
-	width: 95%;
-	margin: 1% !important;
-}
-
-@@media (min-width: 576px) {
-	.list-group-item {
-		width: 47%;
-		margin: 5px 1.5% !important;
-	}
-}
-
-@@media (min-width: 768px) {
-	.list-group-item {
-		width: 31.333%;
-		margin: 5px 1% !important;
-	}
-}
-
-@@media (min-width: 992px) {
-	.list-group-item {
-		width: 23%;
-		margin: 5px 1% !important;
-	}
-}
-
-</style>
-*@
-
-<div style="display:none">
-@{
-    if (Model?.Response == true)
-    {
-        <ul class="list-group list-group-horizontal align-items-stretch flex-wrap">
-            @{ 
-                foreach (var movie in Model.Search)
-                {
-                    <li class="list-group-item border-0">
-                        <div class="card">
-                            <img class="card-img-top" src="@movie.Poster" alt="Movie">
-                            <div class="card-body">
-                                <h4 class="card-title">@movie.Title (@movie.Year)</h4>
-                                <a href="@Url.Action("Details", "Movies", new { i = movie.imdbID })" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> View Details</a>
-                            </div>
-                        </div>
-                    </li>
-                }
-            }
-        </ul>
+        else
+        {
+            <div class="row">
+                <div class="col">
+                    <p><strong>@Model.Error</strong></p>
+                </div>
+            </div>
+        }
     }
-    else
-    {
-        <div class="col-lg-3">
-            <h4>@Model.Error</h4>
-        </div>
-    }
-}
 </div>
 
 

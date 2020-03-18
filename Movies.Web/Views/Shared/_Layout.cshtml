@@ -11,9 +11,15 @@
 </head>
 <body>
     <header>
-
     </header>
     <div class="container">
+        @{
+            if (Url.Action() != "/")
+            {
+                <a href="/" id="home-link" alt="Home"><i class="fas fa-home" style="font-size: 2rem"></i></a>
+            }
+        }
+        @*<a href="/" id="home-link" alt="Home"><i class="fas fa-home" style="font-size: 2rem"></i></a>*@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

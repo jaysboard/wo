@@ -77,14 +77,17 @@ namespace Movies.Web.Controllers
 
         private void setPagination(SearchResult searchResult, int nCurrentPage)
         {
-            searchResult.CurrentPage = nCurrentPage;
-            searchResult.Count = searchResult.totalResults;
-            searchResult.PageSize = 10;
-            searchResult.TotalPages = (int)System.Math.Ceiling(decimal.Divide(searchResult.Count, searchResult.PageSize));
-            searchResult.ShowPrevious = searchResult.CurrentPage > 1;
-            searchResult.ShowNext = searchResult.CurrentPage < searchResult.TotalPages;
-            searchResult.ShowFirst = searchResult.CurrentPage != 1;
-            searchResult.ShowLast = (searchResult.TotalPages != 0) && (searchResult.CurrentPage != searchResult.TotalPages);
+            if (searchResult.totalResults > 0)
+            {
+                searchResult.CurrentPage = nCurrentPage;
+                searchResult.Count = searchResult.totalResults;
+                searchResult.TotalPages = (int)System.Math.Ceiling(decimal.Divide(searchResult.Count, searchResult.PageSize));
+                searchResult.ShowPrevious = searchResult.CurrentPage > 1;
+                searchResult.ShowNext = searchResult.CurrentPage < searchResult.TotalPages;
+                searchResult.ShowFirst = searchResult.CurrentPage != 1;
+                searchResult.ShowLast = (searchResult.TotalPages != 0) && (searchResult.CurrentPage != searchResult.TotalPages);
+            }
+
         }
 
         public IActionResult Details(string i)

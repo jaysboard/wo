@@ -3,21 +3,38 @@
     ViewData["Title"] = $"Movie details for \"{Model.Title}\"";
 }
 
-<div class="col-lg-3 col-md-4 col-sm-6">
-    <article class="card">
-        <header class="title-header">
-            <h3>@Model.Title</h3>
-        </header>
-        <div class="card-block">
-            <div class="img-card">
-                <img src="@Model.Poster" alt="Movie" class="w-100">
+@*<div class="col-lg-3 col-md-4 col-sm-6">
+        <article class="card">
+            <header class="title-header">
+                <h3>@Model.Title</h3>
+            </header>
+            <div class="card-block">
+                <div class="img-card">
+                    <img src="@Model.Poster" alt="Movie" class="w-100">
+                </div>
+                <p class="tagline card-text text-xs-center">Released: @Model.Released</p>
+                <p class="tagline card-text text-xs-center">Plot: @Model.Plot</p>
+                <p class="tagline card-text text-xs-center">Director: @Model.Director</p>
+                <p class="tagline card-text text-xs-center">IMDB rating: @Model.imdbRating/10 (@Model.imdbVotes)</p>
             </div>
-            <p class="tagline card-text text-xs-center">Released: @Model.Released</p>
-            <p class="tagline card-text text-xs-center">Plot: @Model.Plot</p>
-            <p class="tagline card-text text-xs-center">Director: @Model.Director</p>
-            <p class="tagline card-text text-xs-center">IMDB rating: @Model.imdbRating/10 (@Model.imdbVotes)</p>
+        </article>
+    </div>*@
+
+<div class="card">
+    <div class="row no-gutters">
+        <div class="col-auto">
+            <img src="@Model.Poster" alt="Movie">
         </div>
-    </article>
+        <div class="col">
+            <div class="card-block px-2">
+                <h4 class="card-title">@Model.Title</h4>
+                <p class="tagline card-text text-xs-center">Released: @Model.Released</p>
+                <p class="tagline card-text text-xs-center">Plot: @Model.Plot</p>
+                <p class="tagline card-text text-xs-center">Director: @Model.Director</p>
+                <p class="tagline card-text text-xs-center">IMDB rating: @Model.imdbRating/10 (@Model.imdbVotes)</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section JSONLD
@@ -27,9 +44,10 @@
         {
             <script type="application/ld+json">
                 @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    Model.movie, 
+                    Model.movie,
                     Newtonsoft.Json.Formatting.Indented,
-                    new Newtonsoft.Json.JsonSerializerSettings { 
+                    new Newtonsoft.Json.JsonSerializerSettings
+                         {
                         NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
                     }
                 ))
